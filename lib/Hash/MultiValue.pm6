@@ -86,11 +86,13 @@ class Hash::MultiValue is Associative {
 
     method kv { %!singles.kv }
     method pairs { %!singles.pairs }
+    method antipairs { %!singles.antipairs }
     method keys { %!singles.keys }
     method values { %!singles.values }
 
     method all-kv { flat @!all-pairs».kv }
     method all-pairs { flat @!all-pairs }
+    method all-antipairs { flat @!all-pairs».antipair }
     method all-keys { flat @!all-pairs».key }
     method all-values { flat @!all-pairs».value }
 
@@ -120,6 +122,10 @@ class Hash::MultiValue is Associative {
 
         %!singles = %!singles, %new-singles;
     }
+
+    # For future consideration
+    # method classify-list ...
+    # method categorize-list ...
 
     multi method perl { 
         "Hash::MultiValue.from-pairs(" 

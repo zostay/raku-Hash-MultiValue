@@ -97,6 +97,16 @@ for @tests -> $test {
 
             subtest {
                 my %expected = @expected;
+                for %t.antipairs -> $p {
+                    my $exp-v = %expected{$p.value} :delete;
+                    is $p.key, $exp-v, "expected value found for {$p.key}";
+                }
+
+                is %expected.elems, 0, 'no extra values left';
+            }, '.antipairs';
+
+            subtest {
+                my %expected = @expected;
 
                 for %t.keys Z %t.values -> $k, $v {
                     my $exp-v = %expected{$k} :delete;
@@ -142,6 +152,19 @@ for @tests -> $test {
 
                 is %expected.values.grep(*.elems > 0).elems, 0, 'no extra pairs left';
             }, '.all-pairs';
+
+            subtest {
+                # deep clone
+                temp %expected = %expected.perl.EVAL;
+
+                diag %t.all-antipairs.perl;
+                for %t.all-antipairs -> $p {
+                    my $exp-p = %expected{$p.value}.shift;
+                    is $p.value, $exp-p.key, "expected value matched to {$p.key}";
+                }
+
+                is %expected.values.grep(*.elems > 0).elems, 0, 'no extra pairs left';
+            }, '.all-antipairs';
 
             subtest {
                 # deep clone
