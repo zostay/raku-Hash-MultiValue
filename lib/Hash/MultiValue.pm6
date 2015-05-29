@@ -87,12 +87,14 @@ class Hash::MultiValue is Associative {
     method kv { %!singles.kv }
     method pairs { %!singles.pairs }
     method antipairs { %!singles.antipairs }
+    method invert { %!singles.invert }
     method keys { %!singles.keys }
     method values { %!singles.values }
 
     method all-kv { flat @!all-pairs».kv }
     method all-pairs { flat @!all-pairs }
-    method all-antipairs { flat @!all-pairs».antipair }
+    method all-antipairs { flat @!all-pairs».invert }
+    method all-invert { flat @!all-pairs».antipair }
     method all-keys { flat @!all-pairs».key }
     method all-values { flat @!all-pairs».value }
 
