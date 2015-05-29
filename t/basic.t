@@ -156,6 +156,22 @@ for @tests -> $test {
 
         is %t.perl, 'Hash::MultiValue.from-pairs("a" => 7, "b" => 8, "b" => 9, "c" => 10, "d" => 6, "e" => 11, "e" => 12, "f" => 13)', ".perl"; 
         is %t.gist, 'Hash::MultiValue.from-pairs(a => 7, b => 8, b => 9, c => 10, d => 6, e => 11, e => 12, f => 13)', ".gist"; 
+
+        %t.push: (a => 14, 'c', 15, e => 16);
+
+        is %t<a>, 14, 'a = 14';
+        is %t<b>, 9, 'b = 9';
+        is %t<c>, 15, 'c = 15';
+        is %t<d>, 6, 'd = 6';
+        is %t<e>, 16, 'e = 16';
+        is %t<f>, 13, 'f = 13';
+
+        is_deeply %t('a'), (7, 14).list, 'a = 7, 14';
+        is_deeply %t('b'), (8, 9).list, 'b = 8, 9';
+        is_deeply %t('c'), (10, 15).list, 'c = 10, 15';
+        is_deeply %t('d'), (6).list, 'd = 6';
+        is_deeply %t('e'), (11, 12, 16).list, 'e = 11, 12, 16';
+        is_deeply %t('f'), (13).list, 'f = 13';
     }, $name;
 }
 

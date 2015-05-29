@@ -4,7 +4,7 @@ class Hash::MultiValue is Associative {
     has @.all-pairs;
     has %.singles = @!all-pairs.hash;
 
-    method add-pairs(@new is copy) {
+    multi method add-pairs(@new is copy) {
         for @!all-pairs.kv -> $i, $v {
             next if $v.defined;
             @!all-pairs[$i] = @new.shift;
@@ -14,6 +14,9 @@ class Hash::MultiValue is Associative {
         @!all-pairs.push: @new;
     }
 
+    multi method add-pairs(*@new) {
+        self.add-pairs(@new);
+    }
 
     multi method from-pairs(@pairs) returns Hash::MultiValue {
         self.bless(all-pairs => @pairs);
@@ -90,6 +93,33 @@ class Hash::MultiValue is Associative {
     method all-pairs { flat @!all-pairs }
     method all-keys { flat @!all-pairs».key }
     method all-values { flat @!all-pairs».value }
+
+    method push(*@values) {
+        my %new-singles;
+        my ($previous, Bool $has-previous);
+        for @values -> $v {
+            if $has-previous {
+                self.add-pairs: $previous => $v;
+                %new-singles{ $previous } = $v;
+
+                $has-previous--;
+            }
+            elsif $v ~~ Enum {
+                self.add-pairs: $v.key => $v.value;
+                %new-singles{ $v.key } = $v.value;
+            }
+            else {
+                $has-previous++;
+                $previous = $v;
+            }
+        }
+
+        if ($has-previous) {
+            warn "Training item in Hash::MultiValue.push";
+        }
+
+        %!singles = %!singles, %new-singles;
+    }
 
     multi method perl { 
         "Hash::MultiValue.from-pairs(" 
