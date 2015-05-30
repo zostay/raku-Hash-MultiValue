@@ -1,6 +1,8 @@
 # TITLE
 Hash::MultiValue
 
+[![Build Status](https://travis-ci.org/zostay/p6-Hash-MultiValue.svg?branch=master)](https://travis-ci.org/zostay/p6-Hash-MultiValue)
+
 # SUBTITLE
 Store multiple values per key, but act like a regular hash too
 
