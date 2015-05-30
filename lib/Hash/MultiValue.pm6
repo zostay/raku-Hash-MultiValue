@@ -212,6 +212,33 @@ class Hash::MultiValue is Associative {
         )
     }
 
+    =begin pod
+    =head2 method kv
+
+    Returns a list alternating between key and value. Each key will only be listed once with a singular value. See L</method all-kv> for a multi-value version.
+
+    =head2 method pairs
+
+    Returns a list of L<Pair> objects. Each key is returned just once pointing to the last (or only) value in the multi-value hash. See L</method all-pairs> for the multi-value version.
+
+    =head2 method antipairs
+
+    This is identical to L</method pairs>, but with the value and keys swapped.
+
+    =head2 method invert
+
+    This is a synonym for L</method antipairs>.
+
+    =head2 method keys
+
+    Returns a list of keys. Each key is returned exactly once. See L</method all-keys> for the multi-value version.
+
+    =head2 method values
+
+    Returns a list of values. Only the last value of a multi-value key is returned. See L</method all-values> for the multi-value version.
+
+    =end pod
+
     method kv { %!singles.kv }
     method pairs { %!singles.pairs }
     method antipairs { %!singles.antipairs }
@@ -219,12 +246,48 @@ class Hash::MultiValue is Associative {
     method keys { %!singles.keys }
     method values { %!singles.values }
 
+    =begin pod
+    =head2 method all-kv
+
+    Returns a list alternating between key and value. Multi-value key will be listed more than once.
+
+    =head2 method all-pairs
+
+    Returns a list of L<Pair> objects. Multi-value keys will be returned multiple times, once for each value associated with the key.
+
+    =head2 method all-antipairs
+
+    This is identical to L</method all-pairs>, but with key and value reversed.
+
+    =head2 method all-invert
+
+    This is a synonym for L</method all-antipairs>.
+
+    =head2 method keys
+
+    This returns a list of keys. Multi-valued keys will be returned more than once. If you want the unique key list, you want to see L</method keys>.
+
+    =head2 method values
+
+    This returns a list of all values, including the multiple values on a single key.
+
+    =end pod
+
     method all-kv { flat @!all-pairs».kv }
     method all-pairs { flat @!all-pairs }
     method all-antipairs { flat @!all-pairs».invert }
     method all-invert { flat @!all-pairs».antipair }
     method all-keys { flat @!all-pairs».key }
     method all-values { flat @!all-pairs».value }
+
+    =begin pod
+    =head2 method push
+
+        method push(*@values)
+
+    This adds new pairs to the list. Any pairs given with a key matching an existing key will cause the single value version of that key to be replaced with the new value. This never overwrites existing values.
+
+    =end pod
 
     method push(*@values) {
         my %new-singles;
@@ -256,12 +319,25 @@ class Hash::MultiValue is Associative {
     # For future consideration
     # method classify-list ...
     # method categorize-list ...
+    
+    =begin pod
+    =head2 method perl
+
+    Returns code as a string that can be evaluated with C<EVAL> to recreate the object.
+    =end pod
 
     multi method perl { 
         "Hash::MultiValue.from-pairs(" 
             ~ @!all-pairs.grep(*.defined).sort(*.key cmp *.key).map(*.perl).join(", ") 
             ~ ")"
     }
+
+    =begin pod
+    =head2 method gist
+
+    Like L</method perl>, but only includes up to the first 100 keys.
+
+    =end pod
 
     multi method gist {
         "Hash::MultiValue.from-pairs(" ~ 
