@@ -25,9 +25,9 @@ for @tests -> $test {
         is %t<b>, 2, 'b = 2';
         is %t<c>, 3, 'c = 3';
 
-        is_deeply %t('a'), (1, 4).list, 'a = 1, 4';
-        is_deeply %t('b'), (2).list, 'b = 2';
-        is_deeply %t('c'), (3).list, 'c = 3';
+        is-deeply %t('a'), (1, 4).list, 'a = 1, 4';
+        is-deeply %t('b'), (2).list, 'b = 2';
+        is-deeply %t('c'), (3).list, 'c = 3';
 
         %t<b> = 5;
         %t<d> = 6;
@@ -37,10 +37,10 @@ for @tests -> $test {
         is %t<c>, 3, 'c = 3';
         is %t<d>, 6, 'd = 6';
 
-        is_deeply %t('a'), (1, 4).list, 'a = 1, 4';
-        is_deeply %t('b'), (5).list, 'b = 5';
-        is_deeply %t('c'), (3).list, 'c = 3';
-        is_deeply %t('d'), (6).list, 'd = 6';
+        is-deeply %t('a'), (1, 4).list, 'a = 1, 4';
+        is-deeply %t('b'), (5).list, 'b = 5';
+        is-deeply %t('c'), (3).list, 'c = 3';
+        is-deeply %t('d'), (6).list, 'd = 6';
 
         %t<a> = 7;
 
@@ -49,10 +49,10 @@ for @tests -> $test {
         is %t<c>, 3, 'c = 3';
         is %t<d>, 6, 'd = 6';
 
-        is_deeply %t('a'), (7).list, 'a = 7';
-        is_deeply %t('b'), (5).list, 'b = 5';
-        is_deeply %t('c'), (3).list, 'c = 3';
-        is_deeply %t('d'), (6).list, 'd = 6';
+        is-deeply %t('a'), (7).list, 'a = 7';
+        is-deeply %t('b'), (5).list, 'b = 5';
+        is-deeply %t('c'), (3).list, 'c = 3';
+        is-deeply %t('d'), (6).list, 'd = 6';
 
         %t('b') = 8, 9;
         %t('c') = 10;
@@ -66,12 +66,12 @@ for @tests -> $test {
         is %t<e>, 12, 'e = 12';
         is %t<f>, 13, 'f = 13';
 
-        is_deeply %t('a'), (7).list, 'a = 7';
-        is_deeply %t('b'), (8, 9).list, 'b = 8, 9';
-        is_deeply %t('c'), (10).list, 'c = 10';
-        is_deeply %t('d'), (6).list, 'd = 6';
-        is_deeply %t('e'), (11, 12).list, 'e = 11, 12';
-        is_deeply %t('f'), (13).list, 'f = 13';
+        is-deeply %t('a'), (7).list, 'a = 7';
+        is-deeply %t('b'), (8, 9).list, 'b = 8, 9';
+        is-deeply %t('c'), (10).list, 'c = 10';
+        is-deeply %t('d'), (6).list, 'd = 6';
+        is-deeply %t('e'), (11, 12).list, 'e = 11, 12';
+        is-deeply %t('f'), (13).list, 'f = 13';
 
         subtest {
             my @expected = (a => 7, b => 9, c => 10, d => 6, e => 12, f => 13);
@@ -118,7 +118,7 @@ for @tests -> $test {
             subtest {
                 my %expected = @expected;
 
-                for %t.keys Z %t.values -> $k, $v {
+                for flat %t.keys Z %t.values -> $k, $v {
                     my $exp-v = %expected{$k} :delete;
                     is $v, $exp-v, "expected value matched to $k";
                 }
@@ -131,17 +131,26 @@ for @tests -> $test {
             # We don't care what order the keys are in, but the order of the
             # values within the keys relative to one another is very important.
             my %expected = (
-                a => (a => 7).list,
-                b => (b => 8, b => 9).list,
-                c => (c => 10).list,
-                d => (d => 6).list,
-                e => (e => 11, e => 12).list,
-                f => (f => 13).list,
+                a => [a => 7],
+                b => [b => 8, b => 9],
+                c => [c => 10],
+                d => [d => 6],
+                e => [e => 11, e => 12],
+                f => [f => 13],
             );
 
+            my sub expected { 
+                %expected.kv.flatmap: -> $k, $v is copy { 
+                    %expected{$k} = [];
+                    for @($v) -> $e is copy {
+                        %expected{$k}.push: $e
+                    }
+                }
+                %expected;
+            }
+
             subtest {
-                # deep clone
-                temp %expected = %expected.perl.EVAL;
+                temp %expected = expected();
 
                 for %t.all-kv -> $k, $v {
                     my $exp-p = %expected{$k}.shift;
@@ -152,8 +161,7 @@ for @tests -> $test {
             }, '.all-kv';
 
             subtest {
-                # deep clone
-                temp %expected = %expected.perl.EVAL;
+                temp %expected = expected();
 
                 for %t.all-pairs -> $p {
                     my $exp-p = %expected{$p.key}.shift;
@@ -164,8 +172,7 @@ for @tests -> $test {
             }, '.all-pairs';
 
             subtest {
-                # deep clone
-                temp %expected = %expected.perl.EVAL;
+                temp %expected = expected();
 
                 diag %t.all-antipairs.perl;
                 for %t.all-antipairs -> $p {
@@ -177,8 +184,7 @@ for @tests -> $test {
             }, '.all-antipairs';
 
             subtest {
-                # deep clone
-                temp %expected = %expected.perl.EVAL;
+                temp %expected = expected();
 
                 diag %t.all-invert.perl;
                 for %t.all-invert -> $p {
@@ -190,17 +196,16 @@ for @tests -> $test {
             }, '.all-invert';
 
             subtest {
-                # deep clone
-                temp %expected = %expected.perl.EVAL;
+                temp %expected = expected();
 
-                for %t.all-keys Z %t.all-values -> $k, $v {
+                for flat %t.all-keys Z %t.all-values -> $k, $v {
                     my $exp-p = %expected{$k}.shift;
                     is $v, $exp-p.value, "expected key and value matched to $k";
                 }
             }, '.all-keys and .all-values';
         }, 'all-pairs list methods';
 
-        is %t.perl, 'Hash::MultiValue.from-pairs("a" => 7, "b" => 8, "b" => 9, "c" => 10, "d" => 6, "e" => 11, "e" => 12, "f" => 13)', ".perl"; 
+        is %t.perl, 'Hash::MultiValue.from-pairs(:a(7), :b(8), :b(9), :c(10), :d(6), :e(11), :e(12), :f(13))', ".perl"; 
         is %t.gist, 'Hash::MultiValue.from-pairs(a => 7, b => 8, b => 9, c => 10, d => 6, e => 11, e => 12, f => 13)', ".gist"; 
 
         %t.push: (a => 14, 'c', 15, e => 16);
@@ -212,12 +217,12 @@ for @tests -> $test {
         is %t<e>, 16, 'e = 16';
         is %t<f>, 13, 'f = 13';
 
-        is_deeply %t('a'), (7, 14).list, 'a = 7, 14';
-        is_deeply %t('b'), (8, 9).list, 'b = 8, 9';
-        is_deeply %t('c'), (10, 15).list, 'c = 10, 15';
-        is_deeply %t('d'), (6).list, 'd = 6';
-        is_deeply %t('e'), (11, 12, 16).list, 'e = 11, 12, 16';
-        is_deeply %t('f'), (13).list, 'f = 13';
+        is-deeply %t('a'), (7, 14).list, 'a = 7, 14';
+        is-deeply %t('b'), (8, 9).list, 'b = 8, 9';
+        is-deeply %t('c'), (10, 15).list, 'c = 10, 15';
+        is-deeply %t('d'), (6).list, 'd = 6';
+        is-deeply %t('e'), (11, 12, 16).list, 'e = 11, 12, 16';
+        is-deeply %t('f'), (13).list, 'f = 13';
     }, $name;
 }
 
