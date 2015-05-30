@@ -327,7 +327,7 @@ method push(*@values) {
 Returns code as a string that can be evaluated with C<EVAL> to recreate the object.
 =end pod
 
-multi method perl returns Str { 
+multi method perl(Hash::MultiValue:D:) returns Str { 
     "Hash::MultiValue.from-pairs(" 
         ~ @!all-pairs.grep(*.defined).sort(*.key cmp *.key).map(*.perl).join(", ") 
         ~ ")"
@@ -340,7 +340,7 @@ Like L</method perl>, but only includes up to the first 100 keys.
 
 =end pod
 
-multi method gist {
+multi method gist(Hash::MultiValue:D:) {
     "Hash::MultiValue.from-pairs(" ~ 
         @!all-pairs.grep(*.defined).sort(*.key cmp *.key).map(-> $elem {
             given ++$ {
