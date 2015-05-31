@@ -246,6 +246,7 @@ method antipairs { %!singles.antipairs }
 method invert { %!singles.invert }
 method keys { %!singles.keys }
 method values { %!singles.values }
+method elems { %!singles.elems }
 
 =begin pod
 =head2 method all-kv
@@ -280,6 +281,7 @@ method all-antipairs { flat @!all-pairs».invert }
 method all-invert { flat @!all-pairs».antipair }
 method all-keys { flat @!all-pairs».key }
 method all-values { flat @!all-pairs».value }
+method all-elems { @!all-pairs.elems }
 
 =begin pod
 =head2 method push

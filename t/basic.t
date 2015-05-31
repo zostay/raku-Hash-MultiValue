@@ -28,6 +28,8 @@ for @tests -> $test {
         is-deeply %t('a'), (1, 4).list, 'a = 1, 4';
         is-deeply %t('b'), (2).list, 'b = 2';
         is-deeply %t('c'), (3).list, 'c = 3';
+        is %t.elems, 3, '.elems';
+        is %t.all-elems, 4, '.all-elems';
 
         %t<b> = 5;
         %t<d> = 6;
@@ -72,6 +74,8 @@ for @tests -> $test {
         is-deeply %t('d'), (6).list, 'd = 6';
         is-deeply %t('e'), (11, 12).list, 'e = 11, 12';
         is-deeply %t('f'), (13).list, 'f = 13';
+        is %t.elems, 6, '.elems';
+        is %t.all-elems, 8, '.all-elems';
 
         subtest {
             my @expected = (a => 7, b => 9, c => 10, d => 6, e => 12, f => 13);
