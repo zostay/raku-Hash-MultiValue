@@ -49,7 +49,7 @@ multi method add-pairs(@new is copy) {
         last unless @new;
     }
 
-    @!all-pairs.push: @new;
+    @!all-pairs.append: @new;
 }
 
 multi method add-pairs(*@new) {
