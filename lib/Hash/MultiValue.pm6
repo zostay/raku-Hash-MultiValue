@@ -195,7 +195,7 @@ You may also use it to write multiple values, which will replace all values curr
 At this time, this operator does not support slices (i.e., using a L<Range> or L<List> of keys to get values for more than one key at once). This might be supported in the future.
 =end pod
 
-method postcircumfix:<( )>($key) is rw {
+method CALL-ME($key) is rw {
     my $self = self;
     my @all-pairs := @!all-pairs;
     Proxy.new(
