@@ -150,7 +150,7 @@ method AT-KEY($key) {
 }
 
 method ASSIGN-KEY($key, $value) { 
-    @!all-pairs[ @!all-pairs.grep-index({ .defined && .key eqv $key }) ] :delete;
+    @!all-pairs[ @!all-pairs.grep({ .defined && .key eqv $key }, :k) ] :delete;
     self.add-pairs(($key => $value).list);
     %!singles{$key} = $value;
     $value;
@@ -164,7 +164,7 @@ method ASSIGN-KEY($key, $value) {
 # }
 
 method DELETE-KEY($key) {
-    @!all-pairs[ @!all-pairs.grep-index({ .defined && .key eqv $key }) ] :delete;
+    @!all-pairs[ @!all-pairs.grep({ .defined && .key eqv $key }, :k) ] :delete;
     %!singles{$key} :delete;
 }
 
@@ -203,7 +203,7 @@ method CALL-ME($key) is rw {
             @(@all-pairs.grep({ .defined && .key eqv $key })».value)
         },
         STORE => method (*@new) {
-            @all-pairs[ @all-pairs.grep-index({ .defined && .key eqv $key }) ] :delete;
+            @all-pairs[ @all-pairs.grep({ .defined && .key eqv $key }, :k) ] :delete;
             $self.add-pairs: @new.map($key => *);
             $self.singles{$key} = @new[*-1];
             @new
