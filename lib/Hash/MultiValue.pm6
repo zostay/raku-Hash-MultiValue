@@ -42,6 +42,8 @@ If some code is handed this object where a common L<Associative> object (like a 
 has @.all-pairs; #= Stores all keys and values for the hash
 has %.singles = @!all-pairs.hash; #= Stores a simplified version of the hash with all keys, but only the last value
 
+# Internal method that fills in wholes with new pairs and appends the rest to
+# the list of pairs.
 multi method add-pairs(@new is copy) {
     for @!all-pairs.kv -> $i, $v {
         next if $v.defined;
