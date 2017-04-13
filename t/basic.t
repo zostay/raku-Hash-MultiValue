@@ -1,25 +1,51 @@
-#!perl6
+#!/usr/bin/env perl6
 
 use v6;
 
 use Test;
 use Hash::MultiValue;
 
+my @kv = 'a', 1, 'b', 2, 'c', 3, 'a', 4;
 my @pairs = a => 1, b => 2, c => 3, a => 4;
 my %hash = a => [1, 4], b => 2, c => 3;
 
 my @tests = (
+    from-kv-array     => { Hash::MultiValue.from-kv(@kv) },
     from-pairs-array  => { Hash::MultiValue.from-pairs(@pairs) },
     from-mixed-hash   => { Hash::MultiValue.from-mixed-hash(%hash) },
+    from-kv-slurpy    => { Hash::MultiValue.from-kv(|@kv) },
     from-pairs-slurpy => { Hash::MultiValue.from-pairs(|@pairs) },
     from-mixed-slurpy => { Hash::MultiValue.from-mixed-hash(|%hash) },
+    new-kv-array      => { Hash::MultiValue.new(:@kv) },
+    new-pairs-array   => { Hash::MultiValue.new(:@pairs) },
+    new-mixed-hash    => { Hash::MultiValue.new(:mixed-hash(%hash)) },
 );
 
 for @tests -> $test {
-    my ($name, $t) = $test.kv;
+    my ($name, &construct) = $test.kv;
 
     subtest {
-        my %t := $t.();
+        my %t := construct();
+
+        my $a = 10;
+        %t<a> := $a;
+        is %t<a>, 10, 'correct value after bind';
+        $a = 42;
+        is %t<a>, 42, 'correct value after change elsewhere';
+
+        my $b1 = 11;
+        my $b2 = 12;
+        %t<b> :delete;
+        %t.push('b' => $b1, 'b' => $b2);
+        is %t('b'), (11, 12), 'b = 11, 12';
+        $b1 = 13;
+        is %t('b'), (13, 12), 'b = 13, 12';
+        $b2 = 14;
+        is %t('b'), (13, 14), 'b = 13, 14';
+    }
+
+    subtest {
+        my %t := construct();
 
         is %t<a>, 4, 'a = 4';
         is %t<b>, 2, 'b = 2';
