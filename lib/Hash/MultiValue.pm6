@@ -1,4 +1,4 @@
-unit class Hash::MultiValue is Associative;
+unit class Hash::MultiValue:ver<0.2>:auth<github:zostay> is Associative;
 
 use v6;
 
@@ -7,7 +7,7 @@ use v6;
 =begin SYNOPSIS
 
     my %mv := Hash::MultiValue.from-pairs: (a => 1, b => 2, c => 3, a => 4);
-    
+
     say %mv<a>; # 4
     say %mv<b>; # 2
 
@@ -62,7 +62,7 @@ multi method add-pairs(*@new) {
     multi method from-pairs(@pairs) returns Hash::MultiValue
     multi method from-pairs(*@pairs) returns Hash::MultiValue
 
-This takes a list of pairs and constructs a L<Hash::MultiValue> object from it. Use this method or L</method from-mixed-hash> instead of L</new>. Multiple pairs with the same key may be included in this list and all values will be associated with that key. 
+This takes a list of pairs and constructs a L<Hash::MultiValue> object from it. Use this method or L</method from-mixed-hash> instead of L</new>. Multiple pairs with the same key may be included in this list and all values will be associated with that key.
 
 Please note, that because of the way Perl 6 handles pairs in slurpy context, you may need to wrap them in a list for this to work:
 
@@ -115,13 +115,13 @@ multi method from-mixed-hash(*%hash) returns Hash::MultiValue {
 
     method postcircumfix:<{ }> (%key) is rw
 
-Whenever reading or writing keys using the C<{ }> operator, the hash will behave as a regular built-in L<Hash>. Any write will overwrite all values that have been set on the multi-value hash with a single value. 
+Whenever reading or writing keys using the C<{ }> operator, the hash will behave as a regular built-in L<Hash>. Any write will overwrite all values that have been set on the multi-value hash with a single value.
 
     my %mv := Hash::MultiValue.from-pairs(a => 1, b => 2, a => 3);
     %mv<a> = 4;
     say %mv('a').join(', '); # 4
 
-Any read will only read a single value, even if multiple values are stored for that key. 
+Any read will only read a single value, even if multiple values are stored for that key.
 
     my %mv := Hash::MultiValue.from-pairs(a => 1, b => 2, a => 3);
     say %mv<a>; # 3
@@ -145,11 +145,11 @@ Binding is not supported at this time, but might be in the future.
 
 =end pod
 
-method AT-KEY($key) { 
-    %!singles{$key} 
+method AT-KEY($key) {
+    %!singles{$key}
 }
 
-method ASSIGN-KEY($key, $value) { 
+method ASSIGN-KEY($key, $value) {
     @!all-pairs[ @!all-pairs.grep({ .defined && .key eqv $key }, :k) ] :delete;
     self.add-pairs(($key => $value).list);
     %!singles{$key} = $value;
@@ -157,7 +157,7 @@ method ASSIGN-KEY($key, $value) {
 }
 
 # Not supported yet
-# method BIND-KEY($key, $value is rw) { 
+# method BIND-KEY($key, $value is rw) {
 #     @!all-pairs = @!all-pairs.grep(*.key !eqv $key);
 #     @!all-pairs.push: $key => $value;
 #     %!singles{$key} := $value;
@@ -199,7 +199,7 @@ method CALL-ME($key) is rw {
     my $self = self;
     my @all-pairs := @!all-pairs;
     Proxy.new(
-        FETCH => method () { 
+        FETCH => method () {
             @(@all-pairs.grep({ .defined && .key eqv $key })».value)
         },
         STORE => method (*@new) {
@@ -327,9 +327,9 @@ method push(*@values, *%values) {
 Returns code as a string that can be evaluated with C<EVAL> to recreate the object.
 =end pod
 
-multi method perl(Hash::MultiValue:D:) returns Str { 
-    "Hash::MultiValue.from-pairs(" 
-        ~ @!all-pairs.grep(*.defined).sort(*.key cmp *.key).map(*.perl).join(", ") 
+multi method perl(Hash::MultiValue:D:) returns Str {
+    "Hash::MultiValue.from-pairs("
+        ~ @!all-pairs.grep(*.defined).sort(*.key cmp *.key).map(*.perl).join(", ")
         ~ ")"
 }
 
@@ -341,7 +341,7 @@ Like L</method perl>, but only includes up to the first 100 keys.
 =end pod
 
 multi method gist(Hash::MultiValue:D:) {
-    "Hash::MultiValue.from-pairs(" ~ 
+    "Hash::MultiValue.from-pairs(" ~
         @!all-pairs.grep(*.defined).sort(*.key cmp *.key).map(-> $elem {
             given ++$ {
                 when 101 { '...' }
