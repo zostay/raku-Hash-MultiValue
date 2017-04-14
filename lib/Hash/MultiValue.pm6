@@ -47,9 +47,24 @@ has %.singles = @!all-pairs.hash; #= Stores a simplified version of the hash wit
 # Internal method that fills in wholes with new pairs and appends the rest to
 # the list of pairs.
 multi method add-pairs(@new is copy) {
+    # Helps to preserve order
+    my %exists := bag(
+        @new.grep({
+            %!singles{ .key } :exists
+        }).map({ .key })
+    );
+    my %encountered := BagHash.new;
+
     for @!all-pairs.kv -> $i, $v {
-        next if $v.defined;
+        with $v {
+            %encountered{ .key }++;
+            next;
+        }
+
+        next if %exists{ @new[0].key } && !%encountered{ @new[0].key } == %exists{ @new[0].key };
+
         @!all-pairs[$i] = @new.shift;
+
         last unless @new;
     }
 
@@ -382,14 +397,14 @@ method push(*@values, *%values) {
     my ($previous, Bool $has-previous);
     for flat @values, %values.pairs -> $v {
         if $has-previous {
-            self.add-pairs: $previous => $v;
+            self.add-pairs: ($previous => $v,);
             %new-singles{ $previous } = $v;
 
             $has-previous--;
         }
         elsif $v ~~ Pair {
-            self.add-pairs: $v.key => $v.value;
-            %new-singles{ $v.key } = $v.value;
+            self.add-pairs: ($v,);
+            %new-singles.push: $v;
         }
         else {
             $has-previous++;
