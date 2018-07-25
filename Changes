@@ -1,4 +1,4 @@
-v0.6    -
+v0.6    2018-07-24
 
     * Fix .perl output so that .perl.EVAL does what's expected.
 
