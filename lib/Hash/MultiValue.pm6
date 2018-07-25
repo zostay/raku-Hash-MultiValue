@@ -430,9 +430,11 @@ Returns code as a string that can be evaluated with C<EVAL> to recreate the obje
 =end pod
 
 multi method perl(Hash::MultiValue:D:) returns Str {
-    "Hash::MultiValue.from-pairs("
-        ~ @!all-pairs.grep(*.defined).sort(*.key cmp *.key).map(*.perl).join(", ")
-        ~ ")"
+    "Hash::MultiValue.from-pairs(("
+        ~ @!all-pairs.grep(*.defined).sort(*.key).map({
+            "{.key.perl} => {.value.perl}"
+        }).join(", ")
+        ~ "))"
 }
 
 =begin pod

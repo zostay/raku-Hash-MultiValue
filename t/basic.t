@@ -235,7 +235,16 @@ for @tests -> $test {
             }, '.all-keys and .all-values';
         }, 'all-pairs list methods';
 
-        is %t.perl, 'Hash::MultiValue.from-pairs(:a(7), :b(8), :b(9), :c(10), :d(6), :e(11), :e(12), :f(13))', ".perl";
+        {
+            use MONKEY-SEE-NO-EVAL;
+            my $got = %t.perl.EVAL;
+            isa-ok $got, Hash::MultiValue;
+            is $got.all-elems, 8;
+            is-deeply $got.all-pairs.sort(*.key), (:a(7), :b(8), :b(9), :c(10), :d(6), :e(11), :e(12), :f(13));
+            #diag %t.perl;
+        }
+
+        todo "gist should be something like this, so if/when it changes... fix this test, mmmmkay?";
         is %t.gist, 'Hash::MultiValue.from-pairs(a => 7, b => 8, b => 9, c => 10, d => 6, e => 11, e => 12, f => 13)', ".gist";
 
         %t.push: a => 14, 'c', 15, 'e' => 16;
