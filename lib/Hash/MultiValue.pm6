@@ -1,6 +1,5 @@
-unit class Hash::MultiValue:ver<0.6>:auth<github:zostay> is Associative;
-
 use v6;
+unit class Hash::MultiValue:ver<0.6>:auth<github:zostay> is Associative;
 
 =NAME Hash::MultiValue - Store multiple values per key, but act like a regular hash too
 

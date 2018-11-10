@@ -1,3 +1,7 @@
+{{$NEXT}}
+
+    * Fix location of use v6 for v6.d. :(
+
 v0.6    2018-07-24
 
     * Fix .perl output so that .perl.EVAL does what's expected.
