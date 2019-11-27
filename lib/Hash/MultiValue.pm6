@@ -140,7 +140,7 @@ multi method new(:%mixed-hash!, :$iterate = Iterable, :&iterator = &iterate-iter
 
 This takes a list of pairs and constructs a L<Hash::MultiValue> object from it. Multiple pairs with the same key may be included in this list and all values will be associated with that key.
 
-It should be noted that you may need to be a little careful with how you pass your pairs into this method. Perl 6 treats anything that looks like a named argument as a named argument. Here's a quick example of what works and what doesn't:
+It should be noted that you may need to be a little careful with how you pass your pairs into this method. Raku treats anything that looks like a named argument as a named argument. Here's a quick example of what works and what doesn't:
 
     # THIS
     my %h := Hash::MultiValue.from-pairs: (a => 1, b => 2, a => 3);
@@ -230,7 +230,7 @@ Any read will only read a single value, even if multiple values are stored for t
     my %mv := Hash::MultiValue.from-pairs(a => 1, b => 2, a => 3);
     say %mv<a>; # 3
 
-Of those values the last value will always be used. This is in keeping with the usual semantics of what happens when you add two pairs with the same key twice in Perl 6.
+Of those values the last value will always be used. This is in keeping with the usual semantics of what happens when you add two pairs with the same key twice in Raku.
 
 You may also use the C<:delete> and C<:exists> adverbs with these objects.
 
